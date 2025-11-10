@@ -1,2 +1,9 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
 rootProject.name = 'maxed'
-include('app')
+include('application', 'user-service:user-service-api', 'user-service:user-service-impl')
