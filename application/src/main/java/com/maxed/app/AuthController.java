@@ -1,6 +1,8 @@
 package com.maxed.app;
 
 import com.maxed.app.jwt.JwtService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +24,7 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/login")
+    @Operation(security = {})
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

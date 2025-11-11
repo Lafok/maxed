@@ -3,6 +3,8 @@ package com.maxed.app;
 import com.maxed.userservice.api.UserRequest;
 import com.maxed.userservice.api.UserResponse;
 import com.maxed.userservice.api.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register")
+    @Operation(security = {})
     public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest userRequest) {
         UserResponse registeredUser = userService.registerUser(userRequest);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
