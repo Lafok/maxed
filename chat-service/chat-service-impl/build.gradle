@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'com.maxed.java-common-conventions'
+}
+
+dependencies {
+    implementation project(':chat-service:chat-service-api')
+    implementation project(':user-service:user-service-api')
+    implementation project(':user-service:user-service-impl')
+
+    implementation(libs.spring.boot.security)
+    implementation(libs.spring.boot.jpa)
+}

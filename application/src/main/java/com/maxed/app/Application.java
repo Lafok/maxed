@@ -9,9 +9,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.maxed.app", "com.maxed.userservice.impl"})
-@EnableJpaRepositories(basePackages = "com.maxed.userservice.impl")
-@EntityScan(basePackages = "com.maxed.userservice.impl")
+@ComponentScan(basePackages = {"com.maxed.app", "com.maxed.userservice.impl", "com.maxed.chatservice.impl"})
+@EnableJpaRepositories(basePackages = {"com.maxed.userservice.impl", "com.maxed.chatservice.impl"})
+@EntityScan(basePackages = {"com.maxed.userservice.impl", "com.maxed.chatservice.impl"})
 @EnableConfigurationProperties(JwtConfig.class)
 public class Application {
 
