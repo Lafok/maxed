@@ -1,0 +1,18 @@
+plugins {
+    id 'com.maxed.java-application-conventions'
+}
+
+dependencies {
+    implementation project(':user-service:user-service-impl')
+    implementation project(':user-service:user-service-api')
+
+    implementation(libs.spring.boot.web)
+    implementation(libs.spring.boot.jpa)
+    implementation(libs.spring.doc)
+    implementation(libs.spring.boot.security)
+    implementation(libs.database.postgresql)
+
+    implementation(libs.jjwt.api)
+    implementation(libs.jjwt.impl)
+    implementation(libs.jjwt.jackson)
+}

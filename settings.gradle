@@ -1,2 +1,7 @@
+plugins {
+    // Apply the foojay-resolver plugin to allow automatic download of JDKs
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '0.7.0'
+}
+
 rootProject.name = 'maxed'
-include('app')
+include('application', 'user-service:user-service-api', 'user-service:user-service-impl')

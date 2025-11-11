@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+    id("io.freefair.lombok")
+}
+
+group = 'com.maxed'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+dependencies {
+    constraints {
+        // Define dependency versions as constraints
+    }
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.1'
+    testImplementation 'org.assertj:assertj-core:3.27.6'
+
+    integrationTestImplementation 'org.junit.jupiter:junit-jupiter:6.0.1'
+    integrationTestImplementation 'org.assertj:assertj-core:3.27.6'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    integrationTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}

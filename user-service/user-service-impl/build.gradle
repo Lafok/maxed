@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+    id 'com.maxed.java-common-conventions'
+}
+
+dependencies {
+    implementation project(':user-service:user-service-api')
+
+    implementation(libs.spring.boot.security)
+    implementation(libs.spring.boot.jpa, {
+        exclude group: "org.apache.tomcat", module: "tomcat-jdbc"
+    })
+}
