@@ -10,5 +10,9 @@ dependencies {
     implementation(libs.spring.boot.jpa)
     implementation(libs.spring.doc)
     implementation(libs.spring.boot.security)
-    runtimeOnly(libs.database.postgresql)
+    implementation(libs.database.postgresql)
+
+    implementation(libs.jjwt.api)
+    implementation(libs.jjwt.impl)
+    implementation(libs.jjwt.jackson)
 }
