@@ -1,14 +1,14 @@
 plugins {
-    id("java-common-conventions")
+    id 'com.maxed.java-application-conventions'
 }
 
 dependencies {
-    implementation libs.spring.boot.starter.web
-    implementation libs.spring.boot.starter.data.jpa
-    implementation libs.spring.boot.starter.security
     implementation project(':user-service:user-service-impl')
     implementation project(':user-service:user-service-api')
-    implementation libs.springdoc.openapi.starter.webmvc.ui
-    implementation libs.spring.boot.starter.validation
-    runtimeOnly libs.postgresql
+
+    implementation(libs.spring.boot.web)
+    implementation(libs.spring.boot.jpa)
+    implementation(libs.spring.doc)
+    implementation(libs.spring.boot.security)
+    runtimeOnly(libs.database.postgresql)
 }

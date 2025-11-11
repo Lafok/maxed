@@ -1,11 +1,16 @@
 package com.maxed.userservice.api;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     UserResponse registerUser(UserRequest userRequest);
-    UserResponse getUserById(Long id);
+
+    Optional<UserResponse> getUserById(Long id);
+
     List<UserResponse> getAllUsers();
-    UserResponse updateUser(Long id, UserRequest userRequest);
-    void deleteUser(Long id);
+
+    Optional<UserResponse> updateUser(Long id, UserRequest userRequest);
+
+    boolean deleteUser(Long id);
 }

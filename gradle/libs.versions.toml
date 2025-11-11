@@ -1,19 +1,18 @@
 [versions]
-springBoot = "3.5.7"
-lombok = "1.18.42"
-springdocOpenapi = "2.8.14"
+spring-boot = "3.5.7"
+spring-doc = "2.8.14"
+postgresql = "42.7.8"
+
 
 [libraries]
-spring-boot-starter-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "springBoot" }
-spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test", version.ref = "springBoot" }
-spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "springBoot" }
-spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "springBoot" }
-spring-boot-starter-security = { module = "org.springframework.boot:spring-boot-starter-security", version.ref = "springBoot" }
-postgresql = { module = "org.postgresql:postgresql", version = "42.7.3" }
-lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "springdocOpenapi" } # Добавляем Springdoc OpenAPI
+spring-boot-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa", version.ref = "spring-boot" }
+spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-security", version.ref = "spring-boot" }
+database-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+spring-doc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "spring-doc" }
+spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
+validation = { module = "org.springframework.boot:spring-boot-starter-validation", version.ref = "spring-boot" }
 
 [plugins]
-spring-boot = { id = "org.springframework.boot", version.ref = "springBoot" }
-java-library = { id = "java-library" }
-lombok = { id = "io.freefair.lombok", version = "8.12" }
+spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
+spring-dependency-management = { id = "io.spring.dependency-management", version = "1.1.7" }
+toolchains = { id = "org.gradle.toolchains.foojay-resolver-convention", version = "1.0.0" }

@@ -1,8 +1,7 @@
 plugins {
-    alias(libs.plugins.java.library)
-    id 'java-common-conventions'
+    id 'com.maxed.java-common-conventions'
 }
 
 dependencies {
-    api libs.spring.boot.starter.validation
+    implementation(libs.validation)
 }
