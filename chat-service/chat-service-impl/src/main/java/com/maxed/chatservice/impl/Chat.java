@@ -27,7 +27,7 @@ public class Chat {
     @Enumerated(EnumType.STRING)
     private ChatType type;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY) // Изменено на LAZY
     @JoinTable(
             name = "user_chat",
             joinColumns = @JoinColumn(name = "chat_id"),
