@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -23,7 +23,7 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/login")
-    @Operation(security = {})
+    @Operation(summary = "Authenticate a user", description = "Authenticates a user with their username and password, returning a JWT token upon success. This endpoint is publicly accessible.")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest authRequest) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(

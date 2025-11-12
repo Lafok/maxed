@@ -1,0 +1,8 @@
+plugins {
+    id 'com.maxed.java-common-conventions'
+}
+
+dependencies {
+    implementation(libs.validation)
+    implementation(libs.spring.data.commons)
+}
