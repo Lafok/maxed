@@ -4,4 +4,5 @@ plugins {
 
 dependencies {
     implementation(libs.validation)
+    implementation(libs.spring.data.commons)
 }
