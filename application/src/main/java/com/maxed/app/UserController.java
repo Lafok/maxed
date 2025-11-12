@@ -19,12 +19,6 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping("/register")
-    @Operation(summary = "Register a new user", description = "Creates a new user account. This endpoint is publicly accessible.")
-    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest userRequest) {
-        UserResponse registeredUser = userService.registerUser(userRequest);
-        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
-    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a user by ID", description = "Retrieves the details of a specific user by their ID.")
