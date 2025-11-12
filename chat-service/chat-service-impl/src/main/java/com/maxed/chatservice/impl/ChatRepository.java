@@ -15,4 +15,10 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
     @Query("SELECT c FROM Chat c JOIN c.participants p WHERE p.id = :userId")
     List<Chat> findChatsByParticipantId(@Param("userId") Long userId);
+
+    @Query("SELECT c, m FROM Chat c " +
+           "JOIN c.participants p " +
+           "LEFT JOIN Message m ON m.chat = c AND m.timestamp = (SELECT MAX(m2.timestamp) FROM Message m2 WHERE m2.chat = c) " +
+           "WHERE p.id = :userId")
+    List<Object[]> findChatsAndLatestMessageByParticipantId(@Param("userId") Long userId);
 }

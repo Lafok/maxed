@@ -46,9 +46,13 @@ public class ChatServiceImpl implements ChatService {
     @Transactional(readOnly = true)
     public List<ChatResponse> getChatsForCurrentUser() {
         User currentUser = getCurrentUser();
-        return chatRepository.findChatsByParticipantId(currentUser.getId()).stream()
-                .map(this::toChatResponse)
-                .collect(Collectors.toList());
+        List<Object[]> results = chatRepository.findChatsAndLatestMessageByParticipantId(currentUser.getId());
+
+        return results.stream().map(result -> {
+            Chat chat = (Chat) result[0];
+            Message latestMessage = (Message) result[1];
+            return toChatResponse(chat, latestMessage);
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -86,7 +90,7 @@ public class ChatServiceImpl implements ChatService {
     private Chat findAndVerifyChatParticipant(Long chatId, Long userId) {
         Chat chat = chatRepository.findById(chatId).orElseThrow(() -> new RuntimeException("Chat not found"));
         if (chat.getParticipants().stream().noneMatch(user -> user.getId().equals(userId))) {
-            throw new RuntimeException("User not part of this chat"); // Should be a 403 Forbidden
+            throw new RuntimeException("User not part of this chat");
         }
         return chat;
     }
@@ -102,6 +106,18 @@ public class ChatServiceImpl implements ChatService {
                 message.getContent(),
                 message.getTimestamp(),
                 new UserSummaryResponse(message.getAuthor().getId(), message.getAuthor().getUsername())
+        );
+    }
+
+    private ChatResponse toChatResponse(Chat chat, Message latestMessage) {
+        return new ChatResponse(
+                chat.getId(),
+                chat.getName(),
+                chat.getType(),
+                chat.getParticipants().stream()
+                        .map(user -> new UserSummaryResponse(user.getId(), user.getUsername()))
+                        .collect(Collectors.toSet()),
+                toMessageResponse(latestMessage)
         );
     }
 
