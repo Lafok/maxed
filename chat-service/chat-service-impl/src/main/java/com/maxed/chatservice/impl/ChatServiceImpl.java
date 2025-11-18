@@ -1,63 +1,38 @@
 package com.maxed.chatservice.impl;
 
+import com.maxed.chatservice.api.*;
 import com.maxed.chatservice.api.exception.ForbiddenException;
 import com.maxed.chatservice.api.exception.ResourceNotFoundException;
-import com.maxed.userservice.api.IAuthenticationFacade;
-import com.maxed.chatservice.api.*;
-import com.maxed.userservice.impl.User;
+import com.maxed.userservice.impl.User; // Добавляем явный импорт для impl.User
 import com.maxed.userservice.impl.UserRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
 
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
     private final MessageRepository messageRepository;
-    private final IAuthenticationFacade authenticationFacade;
 
-    private User getAuthenticatedUserEntity() {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new IllegalStateException("User not authenticated");
-        }
-
-        Object principal = authentication.getPrincipal();
-        return getUserFromPrincipal(principal);
-    }
-
-    private User getUserFromPrincipal(Object principal) {
-        String username;
-        if (principal instanceof UserDetails) {
-            username = ((UserDetails) principal).getUsername();
-        } else if (principal instanceof Principal) {
-            username = ((Principal) principal).getName();
-        } else if (principal instanceof String) {
-            username = (String) principal;
-        } else {
-            throw new IllegalStateException("Authenticated user principal is not an instance of UserDetails, Principal, or String, but: " + principal.getClass().getName());
-        }
-
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found in database: " + username));
+    // Вспомогательный метод для получения полной сущности User из API-версии
+    private User getFullUserEntity(com.maxed.userservice.api.User apiUser) {
+        return userRepository.findById(apiUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + apiUser.getId()));
     }
 
     @Override
     @Transactional
-    public ChatResponse createDirectChat(CreateDirectChatRequest request) {
-        User currentUser = getAuthenticatedUserEntity();
+    public ChatResponse createDirectChat(CreateDirectChatRequest request, com.maxed.userservice.api.User apiCurrentUser) {
+        User currentUser = getFullUserEntity(apiCurrentUser);
         User partner = userRepository.findById(request.partnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.partnerId()));
 
@@ -74,8 +49,8 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ChatResponse> getChatsForCurrentUser() {
-        User currentUser = getAuthenticatedUserEntity();
+    public List<ChatResponse> getChatsForCurrentUser(com.maxed.userservice.api.User apiCurrentUser) {
+        User currentUser = getFullUserEntity(apiCurrentUser);
         List<Object[]> results = chatRepository.findChatsAndLatestMessageByParticipantId(currentUser.getId());
 
         return results.stream().map(result -> {
@@ -84,11 +59,11 @@ public class ChatServiceImpl implements ChatService {
             return toChatResponse(chat, latestMessage);
         }).collect(Collectors.toList());
     }
-    
+
     @Override
     @Transactional
-    public MessageResponse sendMessage(Long chatId, SendMessageRequest request, Principal principal) {
-        User currentUser = getUserFromPrincipal(principal);
+    public MessageResponse sendMessage(Long chatId, SendMessageRequest request, com.maxed.userservice.api.User apiCurrentUser) {
+        User currentUser = getFullUserEntity(apiCurrentUser);
         Chat chat = findAndVerifyChatParticipant(chatId, currentUser.getId());
 
         Message message = Message.builder()
@@ -102,16 +77,16 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional(readOnly = true)
-    public ChatResponse getChatById(Long chatId) {
-        User currentUser = getAuthenticatedUserEntity();
+    public ChatResponse getChatById(Long chatId, com.maxed.userservice.api.User apiCurrentUser) {
+        User currentUser = getFullUserEntity(apiCurrentUser);
         Chat chat = findAndVerifyChatParticipant(chatId, currentUser.getId());
         return toChatResponse(chat);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<MessageResponse> getMessagesForChat(Long chatId, Pageable pageable) {
-        User currentUser = getAuthenticatedUserEntity();
+    public Page<MessageResponse> getMessagesForChat(Long chatId, Pageable pageable, com.maxed.userservice.api.User apiCurrentUser) {
+        User currentUser = getFullUserEntity(apiCurrentUser);
         findAndVerifyChatParticipant(chatId, currentUser.getId());
         return messageRepository.findByChatIdOrderByTimestampDesc(chatId, pageable)
                 .map(this::toMessageResponse);

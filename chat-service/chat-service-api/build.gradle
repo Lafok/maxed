@@ -3,6 +3,7 @@ plugins {
 }
 
 dependencies {
+    implementation project(':user-service:user-service-api')
     implementation(libs.validation)
     implementation(libs.spring.data.commons)
     implementation(libs.spring.boot.web)
