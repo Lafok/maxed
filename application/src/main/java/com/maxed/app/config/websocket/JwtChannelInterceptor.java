@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,7 +32,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 String jwt = authHeader.substring(7);
                 String username = jwtService.extractUsername(jwt);
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                if (username != null) {
                     UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                     if (jwtService.isTokenValid(jwt, userDetails)) {
                         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
@@ -44,6 +45,12 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 }
             }
         }
+
+        Authentication auth = (Authentication) accessor.getUser();
+        if (auth != null) {
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+
         return message;
     }
 }

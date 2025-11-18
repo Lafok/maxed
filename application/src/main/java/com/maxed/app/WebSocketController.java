@@ -22,7 +22,7 @@ public class WebSocketController {
     public void sendMessage(@DestinationVariable String chatId, SendMessageRequest request, Principal principal) {
         // The Principal object is populated by Spring Security from the WebSocket session
         // We can trust it to be the authenticated user
-        MessageResponse messageResponse = chatService.sendMessage(Long.valueOf(chatId), request);
+        MessageResponse messageResponse = chatService.sendMessage(Long.valueOf(chatId), request, principal);
         messagingTemplate.convertAndSend("/topic/chats/" + chatId, messageResponse);
     }
 }

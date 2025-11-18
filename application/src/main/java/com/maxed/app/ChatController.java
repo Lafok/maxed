@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -40,8 +41,8 @@ public class ChatController {
 
     @PostMapping("/{chatId}/messages")
     @Operation(summary = "Send a message to a chat", description = "Sends a new message to the specified chat. The authenticated user must be a participant of the chat.")
-    public ResponseEntity<MessageResponse> sendMessage(@PathVariable Long chatId, @RequestBody SendMessageRequest request) {
-        MessageResponse messageResponse = chatService.sendMessage(chatId, request);
+    public ResponseEntity<MessageResponse> sendMessage(@PathVariable Long chatId, @RequestBody SendMessageRequest request, Principal principal) {
+        MessageResponse messageResponse = chatService.sendMessage(chatId, request, principal);
         return new ResponseEntity<>(messageResponse, HttpStatus.CREATED);
     }
 

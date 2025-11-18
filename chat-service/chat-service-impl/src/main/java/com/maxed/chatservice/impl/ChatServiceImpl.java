@@ -9,10 +9,12 @@ import com.maxed.userservice.impl.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
+import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,11 +29,29 @@ public class ChatServiceImpl implements ChatService {
     private final IAuthenticationFacade authenticationFacade;
 
     private User getAuthenticatedUserEntity() {
-        Object principal = authenticationFacade.getPrincipal();
-        if (principal instanceof User) {
-            return (User) principal;
+        Authentication authentication = authenticationFacade.getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new IllegalStateException("User not authenticated");
         }
-        throw new IllegalStateException("Authenticated user principal is not an instance of com.maxed.userservice.impl.User");
+
+        Object principal = authentication.getPrincipal();
+        return getUserFromPrincipal(principal);
+    }
+
+    private User getUserFromPrincipal(Object principal) {
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else if (principal instanceof Principal) {
+            username = ((Principal) principal).getName();
+        } else if (principal instanceof String) {
+            username = (String) principal;
+        } else {
+            throw new IllegalStateException("Authenticated user principal is not an instance of UserDetails, Principal, or String, but: " + principal.getClass().getName());
+        }
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found in database: " + username));
     }
 
     @Override
@@ -67,8 +87,8 @@ public class ChatServiceImpl implements ChatService {
     
     @Override
     @Transactional
-    public MessageResponse sendMessage(Long chatId, SendMessageRequest request) {
-        User currentUser = getAuthenticatedUserEntity();
+    public MessageResponse sendMessage(Long chatId, SendMessageRequest request, Principal principal) {
+        User currentUser = getUserFromPrincipal(principal);
         Chat chat = findAndVerifyChatParticipant(chatId, currentUser.getId());
 
         Message message = Message.builder()
