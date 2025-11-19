@@ -5,7 +5,6 @@ import com.maxed.userservice.api.UserRequest;
 import com.maxed.userservice.api.UserResponse;
 import com.maxed.userservice.api.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

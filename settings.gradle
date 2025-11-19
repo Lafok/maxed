@@ -4,4 +4,4 @@ plugins {
 }
 
 rootProject.name = 'maxed'
-include('application', 'user-service:user-service-api', 'user-service:user-service-impl')
+include('application', 'user-service:user-service-api', 'user-service:user-service-impl', 'chat-service:chat-service-api', 'chat-service:chat-service-impl')

@@ -5,11 +5,14 @@ plugins {
 dependencies {
     implementation project(':user-service:user-service-impl')
     implementation project(':user-service:user-service-api')
+    implementation project(':chat-service:chat-service-impl')
+    implementation project(':chat-service:chat-service-api')
 
     implementation(libs.spring.boot.web)
     implementation(libs.spring.boot.jpa)
     implementation(libs.spring.doc)
     implementation(libs.spring.boot.security)
+    implementation(libs.spring.boot.websocket)
     implementation(libs.database.postgresql)
 
     implementation(libs.jjwt.api)
