@@ -1,12 +1,12 @@
 package com.maxed.app;
 
+import com.maxed.app.security.PrincipalProvider;
 import com.maxed.userservice.api.UserRequest;
 import com.maxed.userservice.api.UserResponse;
 import com.maxed.userservice.api.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,6 +18,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final PrincipalProvider principalProvider;
 
 
     @GetMapping("/{id}")
@@ -32,6 +33,14 @@ public class UserController {
     @Operation(summary = "Get all users", description = "Retrieves a list of all registered users.")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         List<UserResponse> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search users by name", description = "Searches for users whose name starts with the provided query, excluding the current user, and returns a maximum of 5 results.")
+    public ResponseEntity<List<UserResponse>> searchUsersByName(@RequestParam String name) {
+        Long currentUserId = principalProvider.getAuthenticatedUserEntity().getId();
+        List<UserResponse> users = userService.searchUsersByName(name, currentUserId);
         return ResponseEntity.ok(users);
     }
 

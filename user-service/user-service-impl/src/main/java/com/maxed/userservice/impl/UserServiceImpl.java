@@ -12,8 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,6 +55,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<UserResponse> getUsersByIds(Set<Long> ids) {
+        return userRepository.findAllById(ids).stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(this::mapToUserResponse)
@@ -81,6 +91,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> searchUsersByName(String name, Long currentUserId) {
+        if (name == null || name.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return userRepository.findByUsernameStartingWithIgnoreCase(name).stream()
+                .filter(user -> !user.getId().equals(currentUserId))
+                .limit(5) // Limit to 5 results
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
     }
 
     private UserResponse mapToUserResponse(User user) {
