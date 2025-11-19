@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -90,6 +91,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> searchUsersByName(String name, Long currentUserId) {
+        if (name == null || name.isBlank()) {
+            return Collections.emptyList();
+        }
+
+        return userRepository.findByUsernameStartingWithIgnoreCase(name).stream()
+                .filter(user -> !user.getId().equals(currentUserId))
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
     }
 
     private UserResponse mapToUserResponse(User user) {

@@ -11,4 +11,5 @@ public interface UserService {
     List<UserResponse> getAllUsers();
     Optional<UserResponse> updateUser(Long id, UserRequest userRequest);
     boolean deleteUser(Long id);
+    List<UserResponse> searchUsersByName(String name, Long currentUserId);
 }
