@@ -102,6 +102,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
         return userRepository.findByUsernameStartingWithIgnoreCase(name).stream()
                 .filter(user -> !user.getId().equals(currentUserId))
+                .limit(5) // Limit to 5 results
                 .map(this::mapToUserResponse)
                 .collect(Collectors.toList());
     }

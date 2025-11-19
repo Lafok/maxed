@@ -37,7 +37,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
-    @Operation(summary = "Search users by name", description = "Searches for users whose name starts with the provided query, excluding the current user.")
+    @Operation(summary = "Search users by name", description = "Searches for users whose name starts with the provided query, excluding the current user, and returns a maximum of 5 results.")
     public ResponseEntity<List<UserResponse>> searchUsersByName(@RequestParam String name) {
         Long currentUserId = principalProvider.getAuthenticatedUserEntity().getId();
         List<UserResponse> users = userService.searchUsersByName(name, currentUserId);
