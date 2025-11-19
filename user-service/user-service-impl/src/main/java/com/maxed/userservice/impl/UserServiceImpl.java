@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,6 +50,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public Optional<UserResponse> getUserById(Long id) {
         return userRepository.findById(id)
                 .map(this::mapToUserResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsersByIds(Set<Long> ids) {
+        return userRepository.findAllById(ids).stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
     }
 
     @Override

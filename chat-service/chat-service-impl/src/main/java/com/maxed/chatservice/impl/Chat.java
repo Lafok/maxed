@@ -1,6 +1,5 @@
 package com.maxed.chatservice.impl;
 
-import com.maxed.userservice.impl.User;
 import com.maxed.chatservice.api.ChatType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,11 +27,9 @@ public class Chat {
     @Enumerated(EnumType.STRING)
     private ChatType type;
 
-    @ManyToMany(fetch = FetchType.LAZY) // Изменено на LAZY
-    @JoinTable(
-            name = "user_chat",
-            joinColumns = @JoinColumn(name = "chat_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> participants;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "chat_participants", joinColumns = @JoinColumn(name = "chat_id"))
+    @Column(name = "user_id")
+    private Set<Long> participantIds = new HashSet<>();
 }
