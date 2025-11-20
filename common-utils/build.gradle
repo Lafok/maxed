@@ -1,0 +1,7 @@
+plugins {
+    id 'com.maxed.java-common-conventions'
+}
+
+dependencies {
+    implementation(libs.spring.boot.jpa)
+}
