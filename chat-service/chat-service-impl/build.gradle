@@ -7,6 +7,7 @@ dependencies {
     implementation project(':chat-service:chat-service-api')
     implementation project(':user-service:user-service-api')
     implementation project(':user-service:user-service-impl')
+    implementation project(':common-utils')
 
     implementation(libs.spring.boot.security)
     implementation(libs.spring.boot.jpa)
