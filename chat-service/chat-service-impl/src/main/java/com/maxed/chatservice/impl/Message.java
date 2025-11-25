@@ -1,5 +1,6 @@
 package com.maxed.chatservice.impl;
 
+import com.maxed.common.util.CryptoConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Convert(converter = CryptoConverter.class)
     @Column(columnDefinition = "TEXT")
     private String content;
 
