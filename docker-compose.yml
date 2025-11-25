@@ -23,5 +23,21 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    restart: always
+    ports:
+      - "5672:5672"   # port for default AMPQ users
+      - "15672:15672" # admin RabbitMQ
+      - "61613:61613" # port STOMP (for ChatService)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    command: /bin/bash -c "rabbitmq-plugins enable rabbitmq_stomp rabbitmq_management && rabbitmq-server"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 volumes:
   maxed_data:
+  rabbitmq_data:

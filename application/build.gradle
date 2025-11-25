@@ -14,6 +14,8 @@ dependencies {
     implementation(libs.spring.boot.security)
     implementation(libs.spring.boot.websocket)
     implementation(libs.database.postgresql)
+    implementation(libs.spring.boot.reactor.netty)
+    implementation(libs.spring.boot.amqp)
 
     implementation(libs.jjwt.api)
     implementation(libs.jjwt.impl)

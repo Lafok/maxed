@@ -36,6 +36,6 @@ public class WebSocketController {
                 .build();
 
         MessageResponse messageResponse = chatService.sendMessage(chatId, request, currentUser);
-        messagingTemplate.convertAndSend("/topic/chats/" + chatId, messageResponse);
+        messagingTemplate.convertAndSend("/topic/chats." + chatId, messageResponse);
     }
 }
