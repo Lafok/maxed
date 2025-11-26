@@ -3,6 +3,7 @@ package com.maxed.chatservice.impl;
 import com.maxed.chatservice.api.*;
 import com.maxed.chatservice.api.exception.ForbiddenException;
 import com.maxed.chatservice.api.exception.ResourceNotFoundException;
+import com.maxed.chatservice.impl.presence.PresenceService;
 import com.maxed.userservice.api.User;
 import com.maxed.userservice.api.UserResponse;
 import com.maxed.userservice.api.UserService;
@@ -23,6 +24,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRepository chatRepository;
     private final MessageRepository messageRepository;
     private final UserService userService;
+    private final PresenceService presenceService;
 
     @Override
     @Transactional
@@ -33,7 +35,10 @@ public class ChatServiceImpl implements ChatService {
         Optional<Chat> existingChat = chatRepository.findDirectChatBetweenUsers(currentUser.getId(), partner.id());
 
         if (existingChat.isPresent()) {
-            return toChatResponse(existingChat.get(), currentUser, partner);
+            Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(
+                    Set.of(currentUser.getId(), partner.id())
+            );
+            return toChatResponse(existingChat.get(), currentUser, partner, onlineMap);
         }
 
         Chat newChat = Chat.builder()
@@ -42,7 +47,10 @@ public class ChatServiceImpl implements ChatService {
                 .name(partner.username())
                 .build();
 
-        return toChatResponse(chatRepository.save(newChat), currentUser, partner);
+        Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(Set.of(partner.id()));
+        onlineMap.put(currentUser.getId(), true);
+
+        return toChatResponse(chatRepository.save(newChat), currentUser, partner, onlineMap);
     }
 
     @Override
@@ -56,9 +64,11 @@ public class ChatServiceImpl implements ChatService {
 
         Map<Long, UserResponse> userMap = getUsersMap(allUserIds);
 
+        Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(allUserIds);
+
         return chats.stream().map(chat -> {
             Message latestMessage = messageRepository.findFirstByChatIdOrderByTimestampDesc(chat.getId()).orElse(null);
-            return buildChatResponse(chat, latestMessage, userMap);
+            return buildChatResponse(chat, latestMessage, userMap, onlineMap);
         }).collect(Collectors.toList());
     }
 
@@ -75,7 +85,11 @@ public class ChatServiceImpl implements ChatService {
 
         Message savedMsg = messageRepository.save(message);
 
-        UserSummaryResponse authorSummary = new UserSummaryResponse(currentUser.getId(), currentUser.getUsername());
+        UserSummaryResponse authorSummary = new UserSummaryResponse(
+                currentUser.getId(),
+                currentUser.getUsername(),
+                true
+        );
         return new MessageResponse(savedMsg.getId(), savedMsg.getContent(), savedMsg.getTimestamp(), authorSummary);
     }
 
@@ -86,8 +100,10 @@ public class ChatServiceImpl implements ChatService {
 
         Map<Long, UserResponse> userMap = getUsersMap(chat.getParticipantIds());
 
+        Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(chat.getParticipantIds());
+
         Message latestMessage = messageRepository.findFirstByChatIdOrderByTimestampDesc(chatId).orElse(null);
-        return buildChatResponse(chat, latestMessage, userMap);
+        return buildChatResponse(chat, latestMessage, userMap, onlineMap);
     }
 
     @Override
@@ -100,11 +116,15 @@ public class ChatServiceImpl implements ChatService {
         Set<Long> authorIds = messages.stream().map(Message::getAuthorId).collect(Collectors.toSet());
         Map<Long, UserResponse> authorsMap = getUsersMap(authorIds);
 
+        Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(authorIds);
+
         return messages.map(msg -> {
             UserResponse author = authorsMap.get(msg.getAuthorId());
+            boolean isOnline = onlineMap.getOrDefault(msg.getAuthorId(), false);
+
             UserSummaryResponse userSummary = (author != null)
-                    ? new UserSummaryResponse(author.id(), author.username())
-                    : new UserSummaryResponse(msg.getAuthorId(), "Unknown");
+                    ? new UserSummaryResponse(author.id(), author.username(), isOnline)
+                    : new UserSummaryResponse(msg.getAuthorId(), "Unknown", false);
 
             return new MessageResponse(msg.getId(), msg.getContent(), msg.getTimestamp(), userSummary);
         });
@@ -126,28 +146,36 @@ public class ChatServiceImpl implements ChatService {
                 .collect(Collectors.toMap(UserResponse::id, Function.identity()));
     }
 
-    private ChatResponse toChatResponse(Chat chat, User currentUser, UserResponse partner) {
+    private ChatResponse toChatResponse(Chat chat, User currentUser, UserResponse partner, Map<Long, Boolean> onlineMap) {
         Set<UserSummaryResponse> participants = Set.of(
-                new UserSummaryResponse(currentUser.getId(), currentUser.getUsername()),
-                new UserSummaryResponse(partner.id(), partner.username())
+                new UserSummaryResponse(currentUser.getId(), currentUser.getUsername(), onlineMap.getOrDefault(currentUser.getId(), true)),
+                new UserSummaryResponse(partner.id(), partner.username(), onlineMap.getOrDefault(partner.id(), false))
         );
         return new ChatResponse(chat.getId(), chat.getName(), chat.getType(), participants, null);
     }
 
-    private ChatResponse buildChatResponse(Chat chat, Message latestMsg, Map<Long, UserResponse> userMap) {
+    private ChatResponse buildChatResponse(Chat chat, Message latestMsg,
+                                           Map<Long, UserResponse> userMap,
+                                           Map<Long, Boolean> onlineMap) {
         Set<UserSummaryResponse> participants = chat.getParticipantIds().stream()
                 .map(id -> {
                     UserResponse u = userMap.get(id);
-                    return u != null ? new UserSummaryResponse(u.id(), u.username()) : new UserSummaryResponse(id, "Unknown");
+                    boolean isOnline = onlineMap.getOrDefault(id, false);
+
+                    return u != null
+                            ? new UserSummaryResponse(u.id(), u.username(), isOnline)
+                            : new UserSummaryResponse(id, "Unknown", false);
                 })
                 .collect(Collectors.toSet());
 
         MessageResponse msgResponse = null;
         if (latestMsg != null) {
             UserResponse author = userMap.get(latestMsg.getAuthorId());
+            boolean authorOnline = onlineMap.getOrDefault(latestMsg.getAuthorId(), false);
+
             UserSummaryResponse authorSummary = (author != null)
-                    ? new UserSummaryResponse(author.id(), author.username())
-                    : new UserSummaryResponse(latestMsg.getAuthorId(), "Unknown");
+                    ? new UserSummaryResponse(author.id(), author.username(), authorOnline)
+                    : new UserSummaryResponse(latestMsg.getAuthorId(), "Unknown", false);
             msgResponse = new MessageResponse(latestMsg.getId(), latestMsg.getContent(), latestMsg.getTimestamp(), authorSummary);
         }
 

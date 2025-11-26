@@ -11,6 +11,7 @@ spring-boot-security = { module = "org.springframework.boot:spring-boot-starter-
 spring-boot-websocket = { module = "org.springframework.boot:spring-boot-starter-websocket", version.ref = "spring-boot" }
 spring-boot-reactor-netty = { module = "org.springframework.boot:spring-boot-starter-reactor-netty", version.ref = "spring-boot" }
 spring-boot-amqp = { module = "org.springframework.boot:spring-boot-starter-amqp", version.ref = "spring-boot" }
+spring-boot-data-redis = { module = "org.springframework.boot:spring-boot-starter-data-redis", version.ref = "spring-boot" }
 database-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 spring-doc = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "spring-doc" }
 spring-boot-web = { module = "org.springframework.boot:spring-boot-starter-web", version.ref = "spring-boot" }
