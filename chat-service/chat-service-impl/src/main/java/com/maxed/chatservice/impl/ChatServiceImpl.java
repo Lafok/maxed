@@ -63,7 +63,6 @@ public class ChatServiceImpl implements ChatService {
                 .collect(Collectors.toSet());
 
         Map<Long, UserResponse> userMap = getUsersMap(allUserIds);
-
         Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(allUserIds);
 
         return chats.stream().map(chat -> {
@@ -77,8 +76,11 @@ public class ChatServiceImpl implements ChatService {
     public MessageResponse sendMessage(Long chatId, SendMessageRequest request, User currentUser) {
         Chat chat = findAndVerifyChatParticipant(chatId, currentUser.getId());
 
+        MessageType msgType = request.type() != null ? request.type() : MessageType.TEXT;
+
         Message message = Message.builder()
                 .content(request.content())
+                .type(msgType)
                 .authorId(currentUser.getId())
                 .chat(chat)
                 .build();
@@ -90,7 +92,14 @@ public class ChatServiceImpl implements ChatService {
                 currentUser.getUsername(),
                 true
         );
-        return new MessageResponse(savedMsg.getId(), savedMsg.getContent(), savedMsg.getTimestamp(), authorSummary);
+
+        return new MessageResponse(
+                savedMsg.getId(),
+                savedMsg.getContent(),
+                savedMsg.getType(),
+                savedMsg.getTimestamp(),
+                authorSummary
+        );
     }
 
     @Override
@@ -99,7 +108,6 @@ public class ChatServiceImpl implements ChatService {
         Chat chat = findAndVerifyChatParticipant(chatId, currentUser.getId());
 
         Map<Long, UserResponse> userMap = getUsersMap(chat.getParticipantIds());
-
         Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(chat.getParticipantIds());
 
         Message latestMessage = messageRepository.findFirstByChatIdOrderByTimestampDesc(chatId).orElse(null);
@@ -115,7 +123,6 @@ public class ChatServiceImpl implements ChatService {
 
         Set<Long> authorIds = messages.stream().map(Message::getAuthorId).collect(Collectors.toSet());
         Map<Long, UserResponse> authorsMap = getUsersMap(authorIds);
-
         Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(authorIds);
 
         return messages.map(msg -> {
@@ -126,7 +133,13 @@ public class ChatServiceImpl implements ChatService {
                     ? new UserSummaryResponse(author.id(), author.username(), isOnline)
                     : new UserSummaryResponse(msg.getAuthorId(), "Unknown", false);
 
-            return new MessageResponse(msg.getId(), msg.getContent(), msg.getTimestamp(), userSummary);
+            return new MessageResponse(
+                    msg.getId(),
+                    msg.getContent(),
+                    msg.getType(),
+                    msg.getTimestamp(),
+                    userSummary
+            );
         });
     }
 
@@ -176,7 +189,14 @@ public class ChatServiceImpl implements ChatService {
             UserSummaryResponse authorSummary = (author != null)
                     ? new UserSummaryResponse(author.id(), author.username(), authorOnline)
                     : new UserSummaryResponse(latestMsg.getAuthorId(), "Unknown", false);
-            msgResponse = new MessageResponse(latestMsg.getId(), latestMsg.getContent(), latestMsg.getTimestamp(), authorSummary);
+
+            msgResponse = new MessageResponse(
+                    latestMsg.getId(),
+                    latestMsg.getContent(),
+                    latestMsg.getType(),
+                    latestMsg.getTimestamp(),
+                    authorSummary
+            );
         }
 
         return new ChatResponse(chat.getId(), chat.getName(), chat.getType(), participants, msgResponse);

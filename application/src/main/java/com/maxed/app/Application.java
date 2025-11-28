@@ -17,6 +17,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
         "com.maxed.app",
         "com.maxed.userservice.impl",
         "com.maxed.chatservice.impl",
+        "com.maxed.mediaservice.impl",
         "com.maxed.common.util"
 })
 
