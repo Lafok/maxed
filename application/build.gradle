@@ -7,6 +7,8 @@ dependencies {
     implementation project(':user-service:user-service-api')
     implementation project(':chat-service:chat-service-impl')
     implementation project(':chat-service:chat-service-api')
+    implementation project(':media-service:media-service-api')
+    implementation project(':media-service:media-service-impl')
 
     implementation(libs.spring.boot.web)
     implementation(libs.spring.boot.jpa)
@@ -17,6 +19,8 @@ dependencies {
     implementation(libs.spring.boot.reactor.netty)
     implementation(libs.spring.boot.amqp)
     implementation(libs.spring.boot.data.redis)
+    implementation(libs.minio)
+
 
     implementation(libs.jjwt.api)
     implementation(libs.jjwt.impl)
