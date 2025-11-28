@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.database.postgresql)
     implementation(libs.spring.boot.reactor.netty)
     implementation(libs.spring.boot.amqp)
+    implementation(libs.spring.boot.data.redis)
 
     implementation(libs.jjwt.api)
     implementation(libs.jjwt.impl)
