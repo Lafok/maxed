@@ -55,6 +55,7 @@ services:
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_BROWSER_CORS_ALLOW_ORIGIN: "*"
     command: server /data --console-address ":9001"
     volumes:
       - minio_data:/data
@@ -65,9 +66,11 @@ services:
       - minio
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin;
-      /usr/bin/mc mb myminio/chat-files;
-      /usr/bin/mc policy set download myminio/chat-files;
+      until /usr/bin/mc alias set myminio http://minio:9000 minioadmin minioadmin; do
+        echo '...waiting for minio service...' && sleep 1;
+      done;
+      /usr/bin/mc ls myminio/media > /dev/null 2>&1 || /usr/bin/mc mb myminio/media;
+      echo 'MinIO bucket setup complete.';
       exit 0;
       "
 

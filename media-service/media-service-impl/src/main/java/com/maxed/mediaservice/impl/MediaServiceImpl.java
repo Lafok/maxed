@@ -2,14 +2,17 @@ package com.maxed.mediaservice.impl;
 
 import com.maxed.mediaservice.api.FileUploadResponse;
 import com.maxed.mediaservice.api.MediaService;
+import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -32,11 +35,26 @@ public class MediaServiceImpl implements MediaService {
                             .contentType(file.getContentType())
                             .build()
             );
-            // This is a placeholder. You should construct the URL based on your MinIO setup.
-            String fileUrl = "http://localhost:9000/" + bucketName + "/" + fileName;
-            return new FileUploadResponse(fileUrl, fileName);
+            return new FileUploadResponse(null, fileName);
         } catch (Exception e) {
             throw new RuntimeException("Error while uploading file to MinIO", e);
+        }
+    }
+
+    public String getPresignedUrl(String objectName) {
+        if (objectName == null || objectName.isBlank()) {
+            return null;
+        }
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket(bucketName)
+                            .object(objectName)
+                            .expiry(5, TimeUnit.MINUTES)
+                            .build());
+        } catch (Exception e) {
+            return null;
         }
     }
 }

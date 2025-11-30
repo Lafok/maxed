@@ -11,7 +11,15 @@ public interface MediaService {
      * Uploads a file to the storage.
      *
      * @param file The file to upload.
-     * @return A DTO with information about the uploaded file.
+     * @return A DTO containing the generated object name for the uploaded file.
      */
     FileUploadResponse uploadFile(MultipartFile file);
+
+    /**
+     * Generates a temporary, pre-signed URL to access a private object.
+     *
+     * @param objectName The name of the object in the storage.
+     * @return A temporary URL that provides GET access to the file.
+     */
+    String getPresignedUrl(String objectName);
 }

@@ -4,6 +4,7 @@ import com.maxed.chatservice.api.*;
 import com.maxed.chatservice.api.exception.ForbiddenException;
 import com.maxed.chatservice.api.exception.ResourceNotFoundException;
 import com.maxed.chatservice.impl.presence.PresenceService;
+import com.maxed.mediaservice.api.MediaService;
 import com.maxed.userservice.api.User;
 import com.maxed.userservice.api.UserResponse;
 import com.maxed.userservice.api.UserService;
@@ -25,33 +26,7 @@ public class ChatServiceImpl implements ChatService {
     private final MessageRepository messageRepository;
     private final UserService userService;
     private final PresenceService presenceService;
-
-    @Override
-    @Transactional
-    public ChatResponse createDirectChat(CreateDirectChatRequest request, User currentUser) {
-        UserResponse partner = userService.getUserById(request.partnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.partnerId()));
-
-        Optional<Chat> existingChat = chatRepository.findDirectChatBetweenUsers(currentUser.getId(), partner.id());
-
-        if (existingChat.isPresent()) {
-            Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(
-                    Set.of(currentUser.getId(), partner.id())
-            );
-            return toChatResponse(existingChat.get(), currentUser, partner, onlineMap);
-        }
-
-        Chat newChat = Chat.builder()
-                .type(ChatType.DIRECT)
-                .participantIds(Set.of(currentUser.getId(), partner.id()))
-                .name(partner.username())
-                .build();
-
-        Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(Set.of(partner.id()));
-        onlineMap.put(currentUser.getId(), true);
-
-        return toChatResponse(chatRepository.save(newChat), currentUser, partner, onlineMap);
-    }
+    private final MediaService mediaService;
 
     @Override
     @Transactional(readOnly = true)
@@ -93,9 +68,13 @@ public class ChatServiceImpl implements ChatService {
                 true
         );
 
+        String contentUrl = (savedMsg.getType() == MessageType.TEXT)
+                ? savedMsg.getContent()
+                : mediaService.getPresignedUrl(savedMsg.getContent());
+
         return new MessageResponse(
                 savedMsg.getId(),
-                savedMsg.getContent(),
+                contentUrl,
                 savedMsg.getType(),
                 savedMsg.getTimestamp(),
                 authorSummary
@@ -133,15 +112,20 @@ public class ChatServiceImpl implements ChatService {
                     ? new UserSummaryResponse(author.id(), author.username(), isOnline)
                     : new UserSummaryResponse(msg.getAuthorId(), "Unknown", false);
 
+            String contentUrl = (msg.getType() == MessageType.TEXT)
+                    ? msg.getContent()
+                    : mediaService.getPresignedUrl(msg.getContent());
+
             return new MessageResponse(
                     msg.getId(),
-                    msg.getContent(),
+                    contentUrl,
                     msg.getType(),
                     msg.getTimestamp(),
                     userSummary
             );
         });
     }
+
 
     private Chat findAndVerifyChatParticipant(Long chatId, Long userId) {
         Chat chat = chatRepository.findById(chatId)
@@ -190,9 +174,13 @@ public class ChatServiceImpl implements ChatService {
                     ? new UserSummaryResponse(author.id(), author.username(), authorOnline)
                     : new UserSummaryResponse(latestMsg.getAuthorId(), "Unknown", false);
 
+            String contentUrl = (latestMsg.getType() == MessageType.TEXT)
+                    ? latestMsg.getContent()
+                    : mediaService.getPresignedUrl(latestMsg.getContent());
+
             msgResponse = new MessageResponse(
                     latestMsg.getId(),
-                    latestMsg.getContent(),
+                    contentUrl,
                     latestMsg.getType(),
                     latestMsg.getTimestamp(),
                     authorSummary
@@ -200,5 +188,32 @@ public class ChatServiceImpl implements ChatService {
         }
 
         return new ChatResponse(chat.getId(), chat.getName(), chat.getType(), participants, msgResponse);
+    }
+
+    @Override
+    @Transactional
+    public ChatResponse createDirectChat(CreateDirectChatRequest request, User currentUser) {
+        UserResponse partner = userService.getUserById(request.partnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.partnerId()));
+
+        Optional<Chat> existingChat = chatRepository.findDirectChatBetweenUsers(currentUser.getId(), partner.id());
+
+        if (existingChat.isPresent()) {
+            Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(
+                    Set.of(currentUser.getId(), partner.id())
+            );
+            return toChatResponse(existingChat.get(), currentUser, partner, onlineMap);
+        }
+
+        Chat newChat = Chat.builder()
+                .type(ChatType.DIRECT)
+                .participantIds(Set.of(currentUser.getId(), partner.id()))
+                .name(partner.username())
+                .build();
+
+        Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(Set.of(partner.id()));
+        onlineMap.put(currentUser.getId(), true);
+
+        return toChatResponse(chatRepository.save(newChat), currentUser, partner, onlineMap);
     }
 }
