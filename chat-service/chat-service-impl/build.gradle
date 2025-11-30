@@ -5,8 +5,12 @@ plugins {
 
 dependencies {
     implementation project(':chat-service:chat-service-api')
+
     implementation project(':user-service:user-service-api')
     implementation project(':user-service:user-service-impl')
+
+    implementation project(':media-service:media-service-api')
+
     implementation project(':common-utils')
 
     implementation(libs.spring.boot.security)

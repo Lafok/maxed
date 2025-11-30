@@ -1,5 +1,6 @@
 package com.maxed.chatservice.impl;
 
+import com.maxed.chatservice.api.MessageType;
 import com.maxed.common.util.CryptoConverter;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,4 +36,7 @@ public class Message {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id", nullable = false)
     private Chat chat;
+
+    @Enumerated(EnumType.STRING)
+    private MessageType type;
 }

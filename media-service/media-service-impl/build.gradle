@@ -1,0 +1,10 @@
+plugins {
+    id 'java'
+    id 'com.maxed.java-common-conventions'
+}
+
+dependencies {
+    implementation project(':media-service:media-service-api')
+    implementation(libs.minio)
+    implementation(libs.spring.boot.web) // For @Configuration, @Value, etc.
+}
