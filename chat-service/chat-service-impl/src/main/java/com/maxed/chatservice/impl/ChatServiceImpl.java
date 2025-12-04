@@ -11,6 +11,7 @@ import com.maxed.userservice.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,45 @@ public class ChatServiceImpl implements ChatService {
     private final UserService userService;
     private final PresenceService presenceService;
     private final MediaService mediaService;
+    private final SimpMessagingTemplate messagingTemplate;
+
+    @Override
+    @Transactional
+    public ChatResponse createDirectChat(CreateDirectChatRequest request, User currentUser) {
+        UserResponse partner = userService.getUserById(request.partnerId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.partnerId()));
+
+        Optional<Chat> existingChat = chatRepository.findDirectChatBetweenUsers(currentUser.getId(), partner.id());
+
+        if (existingChat.isPresent()) {
+            Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(
+                    Set.of(currentUser.getId(), partner.id())
+            );
+            return toChatResponse(existingChat.get(), currentUser, partner, onlineMap);
+        }
+
+        Chat newChat = Chat.builder()
+                .type(ChatType.DIRECT)
+                .participantIds(Set.of(currentUser.getId(), partner.id()))
+                .name(partner.username())
+                .build();
+
+        Chat savedChat = chatRepository.save(newChat);
+
+        Map<Long, Boolean> onlineMapForCreator = presenceService.getUsersOnlineStatus(Set.of(partner.id()));
+        onlineMapForCreator.put(currentUser.getId(), true);
+        ChatResponse responseForCreator = toChatResponse(savedChat, currentUser, partner, onlineMapForCreator);
+
+        Map<Long, Boolean> onlineMapForPartner = new HashMap<>();
+        onlineMapForPartner.put(partner.id(), onlineMapForCreator.getOrDefault(partner.id(), false));
+        onlineMapForPartner.put(currentUser.getId(), true);
+
+        ChatResponse responseForPartner = toChatResponse(savedChat, currentUser, partner, onlineMapForPartner);
+
+        messagingTemplate.convertAndSend("/topic/users." + partner.username() + ".chats", responseForPartner);
+
+        return responseForCreator;
+    }
 
     @Override
     @Transactional(readOnly = true)
@@ -188,32 +228,5 @@ public class ChatServiceImpl implements ChatService {
         }
 
         return new ChatResponse(chat.getId(), chat.getName(), chat.getType(), participants, msgResponse);
-    }
-
-    @Override
-    @Transactional
-    public ChatResponse createDirectChat(CreateDirectChatRequest request, User currentUser) {
-        UserResponse partner = userService.getUserById(request.partnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.partnerId()));
-
-        Optional<Chat> existingChat = chatRepository.findDirectChatBetweenUsers(currentUser.getId(), partner.id());
-
-        if (existingChat.isPresent()) {
-            Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(
-                    Set.of(currentUser.getId(), partner.id())
-            );
-            return toChatResponse(existingChat.get(), currentUser, partner, onlineMap);
-        }
-
-        Chat newChat = Chat.builder()
-                .type(ChatType.DIRECT)
-                .participantIds(Set.of(currentUser.getId(), partner.id()))
-                .name(partner.username())
-                .build();
-
-        Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(Set.of(partner.id()));
-        onlineMap.put(currentUser.getId(), true);
-
-        return toChatResponse(chatRepository.save(newChat), currentUser, partner, onlineMap);
     }
 }
