@@ -166,6 +166,12 @@ public class ChatServiceImpl implements ChatService {
         });
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public void validateUserIsParticipant(Long chatId, Long userId) {
+        findAndVerifyChatParticipant(chatId, userId);
+    }
+
 
     private Chat findAndVerifyChatParticipant(Long chatId, Long userId) {
         Chat chat = chatRepository.findById(chatId)
