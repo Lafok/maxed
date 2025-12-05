@@ -12,4 +12,5 @@ public interface ChatService {
     ChatResponse getChatById(Long chatId, User currentUser);
     MessageResponse sendMessage(Long chatId, SendMessageRequest request, User currentUser);
     Page<MessageResponse> getMessagesForChat(Long chatId, Pageable pageable, User currentUser);
+    void validateUserIsParticipant(Long chatId, Long userId);
 }
