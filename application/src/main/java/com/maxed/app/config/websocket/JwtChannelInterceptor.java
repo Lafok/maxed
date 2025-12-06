@@ -43,7 +43,6 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 }
             }
         }
-        // Удалена логика с SecurityContextHolder.getContext().setAuthentication(auth);
         return message;
     }
 }

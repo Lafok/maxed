@@ -26,7 +26,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
-    private final UserService userService; // Added UserService dependency
+    private final UserService userService;
 
     @PostMapping("/register")
     @Operation(summary = "Register a new user", description = "Creates a new user account. This endpoint is publicly accessible.")

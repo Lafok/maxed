@@ -26,7 +26,6 @@ public class PrincipalProvider {
         if (principal instanceof com.maxed.userservice.impl.User) {
             implUser = (com.maxed.userservice.impl.User) principal;
         } else if (principal instanceof UserDetails) {
-            // Если это UserDetails, но не наш impl.User, то загрузим его по username
             String username = ((UserDetails) principal).getUsername();
             implUser = userRepository.findByUsername(username)
                     .orElseThrow(() -> new IllegalStateException("Authenticated user not found in database: " + username));
@@ -34,7 +33,6 @@ public class PrincipalProvider {
             throw new IllegalStateException("Authenticated user principal is not an instance of UserDetails or com.maxed.userservice.impl.User, but: " + principal.getClass().getName());
         }
 
-        // Преобразуем impl.User в api.User
         return User.builder()
                 .id(implUser.getId())
                 .username(implUser.getUsername())
