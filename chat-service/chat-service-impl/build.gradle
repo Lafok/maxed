@@ -17,4 +17,5 @@ dependencies {
     implementation(libs.spring.boot.jpa)
     implementation(libs.spring.boot.data.redis)
     implementation(libs.spring.boot.websocket)
+    implementation(libs.spring.kafka)
 }

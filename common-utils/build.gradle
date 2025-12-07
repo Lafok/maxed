@@ -3,5 +3,6 @@ plugins {
 }
 
 dependencies {
+    implementation project(':chat-service:chat-service-api')
     implementation(libs.spring.boot.jpa)
 }
