@@ -1,6 +1,6 @@
 package com.maxed.chatservice.api;
 
-import com.maxed.userservice.api.User; // Используем API-версию User
+import com.maxed.userservice.api.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,4 +13,5 @@ public interface ChatService {
     MessageResponse sendMessage(Long chatId, SendMessageRequest request, User currentUser);
     Page<MessageResponse> getMessagesForChat(Long chatId, Pageable pageable, User currentUser);
     void validateUserIsParticipant(Long chatId, Long userId);
+    void markChatAsRead(Long chatId, User currentUser);
 }
