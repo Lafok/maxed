@@ -4,6 +4,7 @@ import com.maxed.chatservice.api.*;
 import com.maxed.chatservice.api.exception.ForbiddenException;
 import com.maxed.chatservice.api.exception.ResourceNotFoundException;
 import com.maxed.chatservice.impl.presence.PresenceService;
+import com.maxed.common.event.MessageCreatedEvent;
 import com.maxed.mediaservice.api.MediaService;
 import com.maxed.userservice.api.User;
 import com.maxed.userservice.api.UserResponse;
@@ -11,6 +12,7 @@ import com.maxed.userservice.api.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ public class ChatServiceImpl implements ChatService {
     private final PresenceService presenceService;
     private final MediaService mediaService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     @Transactional
@@ -101,6 +104,17 @@ public class ChatServiceImpl implements ChatService {
                 .build();
 
         Message savedMsg = messageRepository.save(message);
+
+        var event = new MessageCreatedEvent(
+                String.valueOf(savedMsg.getId()),
+                savedMsg.getContent(),
+                chatId,
+                currentUser.getId(),
+                savedMsg.getTimestamp(),
+                savedMsg.getType()
+        );
+        kafkaTemplate.send("chat.messages", String.valueOf(chatId), event);
+
 
         UserSummaryResponse authorSummary = new UserSummaryResponse(
                 currentUser.getId(),

@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 
@@ -18,6 +19,7 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
         "com.maxed.userservice.impl",
         "com.maxed.chatservice.impl",
         "com.maxed.mediaservice.impl",
+        "com.maxed.searchservice",
         "com.maxed.common.util"
 })
 
@@ -25,6 +27,8 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
         "com.maxed.userservice.impl",
         "com.maxed.chatservice.impl"
 })
+
+@EnableElasticsearchRepositories(basePackages = "com.maxed.searchservice")
 
 @EntityScan(basePackages = {
         "com.maxed.userservice.impl",
