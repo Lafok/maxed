@@ -35,17 +35,28 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     @Transactional
+    public void markChatAsRead(Long chatId, User currentUser) {
+        findAndVerifyChatParticipant(chatId, currentUser.getId());
+        messageRepository.markMessagesAsRead(chatId, currentUser.getId());
+    }
+
+    @Override
+    @Transactional
     public ChatResponse createDirectChat(CreateDirectChatRequest request, User currentUser) {
         UserResponse partner = userService.getUserById(request.partnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + request.partnerId()));
 
-        Optional<Chat> existingChat = chatRepository.findDirectChatBetweenUsers(currentUser.getId(), partner.id());
+        Optional<Chat> existingChatOptional = chatRepository.findDirectChatBetweenUsers(currentUser.getId(), partner.id());
 
-        if (existingChat.isPresent()) {
-            Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(
-                    Set.of(currentUser.getId(), partner.id())
-            );
-            return toChatResponse(existingChat.get(), currentUser, partner, onlineMap);
+        if (existingChatOptional.isPresent()) {
+            Chat existingChat = existingChatOptional.get();
+            Set<Long> participantIds = existingChat.getParticipantIds();
+
+            Message latestMessage = messageRepository.findFirstByChatIdOrderByTimestampDesc(existingChat.getId()).orElse(null);
+            Map<Long, UserResponse> userMap = getUsersMap(participantIds);
+            Map<Long, Boolean> onlineMap = presenceService.getUsersOnlineStatus(participantIds);
+
+            return buildChatResponse(existingChat, latestMessage, userMap, onlineMap);
         }
 
         Chat newChat = Chat.builder()
@@ -131,7 +142,8 @@ public class ChatServiceImpl implements ChatService {
                 contentUrl,
                 savedMsg.getType(),
                 savedMsg.getTimestamp(),
-                authorSummary
+                authorSummary,
+                savedMsg.getStatus()
         );
     }
 
@@ -175,7 +187,8 @@ public class ChatServiceImpl implements ChatService {
                     contentUrl,
                     msg.getType(),
                     msg.getTimestamp(),
-                    userSummary
+                    userSummary,
+                    msg.getStatus()
             );
         });
     }
@@ -243,7 +256,8 @@ public class ChatServiceImpl implements ChatService {
                     contentUrl,
                     latestMsg.getType(),
                     latestMsg.getTimestamp(),
-                    authorSummary
+                    authorSummary,
+                    latestMsg.getStatus()
             );
         }
 

@@ -1,5 +1,6 @@
 package com.maxed.chatservice.impl;
 
+import com.maxed.chatservice.api.MessageStatus;
 import com.maxed.chatservice.api.MessageType;
 import com.maxed.common.util.CryptoConverter;
 import jakarta.persistence.*;
@@ -39,4 +40,9 @@ public class Message {
 
     @Enumerated(EnumType.STRING)
     private MessageType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private MessageStatus status = MessageStatus.SENT;
 }

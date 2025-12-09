@@ -1,10 +1,7 @@
 package com.maxed.app;
 
 import com.maxed.app.security.PrincipalMapper;
-import com.maxed.chatservice.api.ChatService;
-import com.maxed.chatservice.api.MessageResponse;
-import com.maxed.chatservice.api.SendMessageRequest;
-import com.maxed.chatservice.api.TypingEvent;
+import com.maxed.chatservice.api.*;
 import com.maxed.userservice.api.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,5 +43,16 @@ public class WebSocketController {
         );
 
         messagingTemplate.convertAndSend("/topic/chats." + chatId + ".typing", broadcastEvent);
+    }
+
+    @MessageMapping("/chat.read/{chatId}")
+    public void markAsRead(@DestinationVariable Long chatId, Principal principal) {
+        User currentUser = principalMapper.toApiUser(principal);
+
+        chatService.markChatAsRead(chatId, currentUser);
+
+        ChatReadEvent event = new ChatReadEvent(chatId, currentUser.getId());
+
+        messagingTemplate.convertAndSend("/topic/chats." + chatId + ".read", event);
     }
 }
