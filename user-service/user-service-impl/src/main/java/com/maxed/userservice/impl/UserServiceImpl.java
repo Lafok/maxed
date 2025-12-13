@@ -1,5 +1,6 @@
 package com.maxed.userservice.impl;
 
+import com.maxed.mediaservice.api.MediaService;
 import com.maxed.userservice.api.Role;
 import com.maxed.userservice.api.UserRequest;
 import com.maxed.userservice.api.UserResponse;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MediaService mediaService;
 
 
     @Override
@@ -107,8 +110,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    @Transactional
+    public UserResponse updateUserAvatar(Long userId, MultipartFile avatarFile) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+
+        String avatarKey = mediaService.uploadAvatar(avatarFile);
+        user.setAvatarUrl(avatarKey);
+
+        User updatedUser = userRepository.save(user);
+        return mapToUserResponse(updatedUser);
+    }
+
     private UserResponse mapToUserResponse(User user) {
-        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole());
+        String avatarUrl = mediaService.getPresignedUrl(user.getAvatarUrl());
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getRole(), avatarUrl);
     }
 
     @Override

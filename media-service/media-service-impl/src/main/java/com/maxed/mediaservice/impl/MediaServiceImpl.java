@@ -41,6 +41,24 @@ public class MediaServiceImpl implements MediaService {
         }
     }
 
+    @Override
+    public String uploadAvatar(MultipartFile file) {
+        try {
+            String fileName = "avatars/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+            minioClient.putObject(
+                    PutObjectArgs.builder()
+                            .bucket(bucketName)
+                            .object(fileName)
+                            .stream(file.getInputStream(), file.getSize(), -1)
+                            .contentType(file.getContentType())
+                            .build()
+            );
+            return fileName;
+        } catch (Exception e) {
+            throw new RuntimeException("Error while uploading avatar to MinIO", e);
+        }
+    }
+
     public String getPresignedUrl(String objectName) {
         if (objectName == null || objectName.isBlank()) {
             return null;
