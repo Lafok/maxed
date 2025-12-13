@@ -16,6 +16,14 @@ public interface MediaService {
     FileUploadResponse uploadFile(MultipartFile file);
 
     /**
+     * Uploads an avatar image to the storage.
+     *
+     * @param file The avatar file to upload.
+     * @return The unique object name (key) for the uploaded avatar.
+     */
+    String uploadAvatar(MultipartFile file);
+
+    /**
      * Generates a temporary, pre-signed URL to access a private object.
      *
      * @param objectName The name of the object in the storage.

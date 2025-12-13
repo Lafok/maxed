@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     implementation project(':user-service:user-service-api')
+    implementation project(':media-service:media-service-api')
 
     implementation(libs.spring.boot.security)
     implementation(libs.spring.boot.jpa, {
