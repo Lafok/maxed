@@ -1,4 +1,4 @@
-# Maxed Messenger 💬
+# Maxed Messenger
 
 ![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3-green?style=flat-square&logo=springboot)
