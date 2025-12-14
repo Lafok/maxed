@@ -2,7 +2,7 @@
 
 ![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3-green?style=flat-square&logo=springboot)
-![React](https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react)
+![React](https://img.shields.io/badge/React-19-blue?style=flat-square&logo=react)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Messaging-orange?style=flat-square&logo=rabbitmq)
 ![Kafka](https://img.shields.io/badge/Kafka-Streaming-black?style=flat-square&logo=apachekafka)
 ![Redis](https://img.shields.io/badge/Redis-Caching-red?style=flat-square&logo=redis)
@@ -12,6 +12,7 @@
 A modern, scalable, real-time messaging platform built with a **Modular Monolith** architecture.
 Designed to handle high concurrency using event-driven patterns, ensuring data consistency and low latency.
 
+[![Frontend Repo](https://img.shields.io/badge/Maxed_Frontend-React_App-blue?style=for-the-badge&logo=react)](https://github.com/Lafok/maxed_frontend)
 ---
 
 ## 🏗 System Architecture & Engineering
@@ -113,7 +114,7 @@ This project demonstrates the transition from a simple CRUD application to a dis
 *   **MinIO:** S3-compatible object storage.
 
 **Frontend**
-*   **React 18, TypeScript**
+*   **React 19, TypeScript**
 *   **Tailwind CSS** (Styling)
 *   **STOMPjs** (WebSocket Client)
 *   **Axios** (HTTP Client)
@@ -126,7 +127,7 @@ The entire infrastructure is defined in `docker-compose.yml` for easy setup.
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/your-username/maxed-messenger.git
+    git clone https://github.com/Lafok/maxed
     ```
 
 2.  **Start Infrastructure:**
@@ -141,8 +142,10 @@ The entire infrastructure is defined in `docker-compose.yml` for easy setup.
     ```
 
 4.  **Run Frontend:**
+    *Open a new terminal and clone the frontend repository:*
     ```bash
-    cd frontend
+    git clone https://github.com/Lafok/maxed_frontend
+    cd maxed_frontend
     npm install
     npm run dev
     ```
