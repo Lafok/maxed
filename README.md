@@ -11,21 +11,14 @@
 
 A scalable, real-time messaging platform built with a **Modular Monolith** architecture.
 Designed to handle high loads using event-driven patterns and industry-standard infrastructure.
-[▶ Watch demo](assets/avatar-change-1.mp4)
+
+![Avatar change demo](https://cdn.discordapp.com/attachments/692687778802040892/1449806227948179516/sendmedia-1-ezgif.com-video-to-gif-converter.gif?ex=69403cc4&is=693eeb44&hm=f01c67c774b74694c68cd6533432bdab80151f4aabfc88a459f2501f636f19cd&)
+
 
 <p align="center">
-  <video
-    src="https://user-images.githubusercontent.com/XXXX/avatar-change-1.mp4"
-    autoplay
-    loop
-    muted
-    playsinline
-    width="700">
-  </video>
+  <img
+    src="https://cdn.discordapp.com/attachments/692687778802040892/1449806227948179516/sendmedia-1-ezgif.com-video-to-gif-converter.gif?ex=69403cc4&is=693eeb44&hm=f01c67c774b74694c68cd6533432bdab80151f4aabfc88a459f2501f636f19cd&"
+    width="700"
+    alt="Avatar change demo"
+  />
 </p>
-
-<p align="center">
-  <img src="assets/demo.gif" width="700">
-</p>
-
-![Demo](assets/demo.gif)
