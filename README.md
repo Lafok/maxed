@@ -11,4 +11,19 @@
 
 A scalable, real-time messaging platform built with a **Modular Monolith** architecture.
 Designed to handle high loads using event-driven patterns and industry-standard infrastructure.
-<video src="assets/avatar-change-1.mp4" controls autoplay loop muted></video>
+[▶ Watch demo](assets/avatar-change-1.mp4)
+
+<p align="center">
+  <video
+    src="https://user-images.githubusercontent.com/XXXX/avatar-change-1.mp4"
+    autoplay
+    loop
+    muted
+    playsinline
+    width="700">
+  </video>
+</p>
+
+<p align="center">
+  <img src="assets/demo.gif" width="700">
+</p>
