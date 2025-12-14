@@ -27,3 +27,5 @@ Designed to handle high loads using event-driven patterns and industry-standard 
 <p align="center">
   <img src="assets/demo.gif" width="700">
 </p>
+
+![Demo](assets/demo.gif)
