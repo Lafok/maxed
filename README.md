@@ -1,6 +1,6 @@
 # Maxed Messenger 💬
 
-![Java](https://img.shields.io/badge/Java-17-orange?style=flat-square&logo=java)
+![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=java)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3-green?style=flat-square&logo=springboot)
 ![React](https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Messaging-orange?style=flat-square&logo=rabbitmq)
@@ -97,7 +97,7 @@ This project demonstrates the transition from a simple CRUD application to a dis
 ## 🛠 Tech Stack
 
 **Backend**
-*   **Java 17, Spring Boot 3**
+*   **Java 21, Spring Boot 3**
 *   **Spring Security** (JWT Authentication)
 *   **Spring Data JPA** (PostgreSQL)
 *   **Spring Data Redis** (Cache & Presence)
