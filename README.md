@@ -12,7 +12,7 @@
 A modern, scalable, real-time messaging platform built with a **Modular Monolith** architecture.
 Designed to handle high concurrency using event-driven patterns, ensuring data consistency and low latency.
 
-[![Frontend Repo](https://img.shields.io/badge/Maxed_Frontend-React_App-blue?style=for-the-badge&logo=react)](https://github.com/Lafok/maxed_frontend)
+> **Frontend Repository:** [https://github.com/Lafok/maxed_frontend](https://github.com/Lafok/maxed_frontend)
 ---
 
 ## 🏗 System Architecture & Engineering
